@@ -124,7 +124,10 @@ func Foo() int {
     return 42
 }
 ";
-    assert_eq!(reflow_source(input, Language::Go, &Options::new(68)), expected);
+    assert_eq!(
+        reflow_source(input, Language::Go, &Options::new(68)),
+        expected
+    );
 }
 
 #[test]

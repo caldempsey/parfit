@@ -26,10 +26,7 @@ pub(crate) fn is_default_directive(line: &str) -> bool {
     }
 
     // Python pragmas and noqa markers.
-    if line.starts_with("# type:")
-        || line.starts_with("# noqa")
-        || line.starts_with("# pragma:")
-    {
+    if line.starts_with("# type:") || line.starts_with("# noqa") || line.starts_with("# pragma:") {
         return true;
     }
 
@@ -52,7 +49,11 @@ pub(crate) fn is_default_directive(line: &str) -> bool {
     }
 
     // Separator lines inside comments ("// ----" etc.).
-    if line.chars().all(|c| "-=*_".contains(c) || c.is_whitespace()) && !line.trim().is_empty() {
+    if line
+        .chars()
+        .all(|c| "-=*_".contains(c) || c.is_whitespace())
+        && !line.trim().is_empty()
+    {
         return true;
     }
 
