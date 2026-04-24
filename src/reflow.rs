@@ -147,7 +147,7 @@ fn emit_paragraph(lines: &[&str], prefix: &str, opts: &Options, out: &mut String
 /// the "valid parentheses" pattern (LeetCode 20): push on an open
 /// marker, pop on the matching close, inspect the top to know the
 /// current enclosing region, but operate at line granularity.
-
+///
 /// Per call: O(k) where k is the number of configured fences (two
 /// for Markdown, zero for every other language). Amortized O(1).
 struct FenceStack<'a> {
