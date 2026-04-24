@@ -207,9 +207,16 @@ whole, so install snippets and code examples survive reflow.  The
 fence matcher uses the classic stack pattern from LeetCode 20
 ("Valid Parentheses"): push on a matching open, pop on the
 matching close, consult the top to know the current region.
-Three backticks in a row — an open, a close, then an open that
-never closes — behaves as you would expect: every line passes
-through.
+
+Block comments (`/* … */`) are just the inverse: the contents
+reflow as prose instead of passing through.
+
+Under the hood, the four per-language markers sit on a 2×2:
+
+                 | reflow contents | pass through verbatim
+    -------------|-----------------|----------------------
+    line-level   | line_markers    | ignore_markers
+    region-level | block_comments  | fences
 
 
 Differences from par
