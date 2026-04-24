@@ -46,7 +46,8 @@ fn leaves_ts_ignore_directive_untouched() {
 
 #[test]
 fn custom_skip_regex_passes_line_through() {
-    let input = "// TODO(cal): this is a very long line that normally would be wrapped at thirty cols\n";
+    let input =
+        "// TODO(cal): this is a very long line that normally would be wrapped at thirty cols\n";
     let opts = Options::new(30).with_skip(r"TODO\(").unwrap();
     assert_eq!(reflow(input, &opts), input);
 }
@@ -77,7 +78,8 @@ fn preserves_exact_url_body() {
 
 #[test]
 fn hash_prefix_shell_style() {
-    let input = "# this is a shell comment that is long enough to need wrapping at a sensible width\n";
+    let input =
+        "# this is a shell comment that is long enough to need wrapping at a sensible width\n";
     let out = reflow(input, &Options::new(40));
     for line in out.lines() {
         assert!(line.starts_with("# "));

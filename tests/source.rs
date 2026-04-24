@@ -14,7 +14,9 @@ def f():
     assert!(out.contains("    x = 42\n"));
     assert!(out.contains("    return x\n"));
     // Comment was wrapped.
-    assert!(!out.contains("this is a really long comment that ought to be reflowed at a narrow width"));
+    assert!(
+        !out.contains("this is a really long comment that ought to be reflowed at a narrow width")
+    );
     for line in out.lines() {
         if line.trim_start().starts_with('#') {
             assert!(line.chars().count() <= 32, "wrapped line too long: {line}");
