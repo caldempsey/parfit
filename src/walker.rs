@@ -45,7 +45,7 @@ pub fn walk(
 
         let walker = WalkBuilder::new(path).build();
         for entry in walker {
-            let entry = entry.map_err(|e| io::Error::new(io::ErrorKind::Other, e.to_string()))?;
+            let entry = entry.map_err(|e| io::Error::other(e.to_string()))?;
             if !entry.file_type().map(|ft| ft.is_file()).unwrap_or(false) {
                 continue;
             }
