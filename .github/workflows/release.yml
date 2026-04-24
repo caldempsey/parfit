@@ -1,9 +1,10 @@
 name: Release
 
 on:
-  push:
-    branches: [dev]
   workflow_dispatch:
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 concurrency:
   group: release-${{ github.ref }}
