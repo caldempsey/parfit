@@ -5,6 +5,9 @@ on:
     branches: ['**']
     tags: ['**']
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 concurrency:
   group: mirror-srht
   cancel-in-progress: false
