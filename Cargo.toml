@@ -1,0 +1,27 @@
+[package]
+name = "parfit"
+version = "0.3.0"
+edition = "2021"
+authors = ["Callum Dempsey Leach"]
+license = "MIT"
+description = "Paragraph fit — a codebase-aware comment reflow tool that wraps prose with optimal-fit line breaking and leaves directives alone. Inspired by par."
+repository = "https://github.com/caldempsey/parfit"
+homepage = "https://github.com/caldempsey/parfit"
+readme = "README"
+keywords = ["cli", "wrap", "reflow", "comments", "formatter"]
+categories = ["command-line-utilities", "text-processing"]
+
+[[bin]]
+name = "parfit"
+path = "src/main.rs"
+
+[dependencies]
+clap = { version = "4.5", features = ["derive"] }
+textwrap = "0.16"
+regex = "1.10"
+ignore = "0.4"
+globset = "0.4"
+
+[profile.release]
+lto = true
+strip = true

@@ -1,0 +1,223 @@
+parfit - paragraph fit
+=======================
+
+parfit reflows the prose inside code comments to a target width
+using optimal-fit line breaking, and passes machine-readable
+directives through unchanged.  It is inspired by Adam M.
+Costello's par (1993) and aims to be a drop-in for the same niche
+with codebase awareness added.
+
+Copyright (C) 2026 Callum Dempsey Leach.  Released under the MIT
+licence; see LICENSE.
+
+
+Installation
+============
+
+    cargo install parfit
+
+Installs a parfit binary on $PATH.
+
+
+Usage
+=====
+
+parfit reads standard input and writes standard output when no
+path is given.  With path arguments, parfit rewrites the files
+in place by default.  Pass --stdout to preview instead.
+
+Positional arguments follow fd-style semantics when -r is set:
+each non-directory argument is treated as a glob-style name
+pattern matched recursively across the working directory tree.
+A positional that is an existing directory becomes the search
+root.  Without -r, positional arguments are literal file paths.
+
+    parfit [OPTIONS] [PATH]...
+
+
+Examples
+========
+
+Pipe a comment block through as a filter:
+
+    cat foo.go | parfit
+
+Reflow one file in place:
+
+    parfit foo.go
+
+Preview without writing:
+
+    parfit --stdout foo.go
+
+Reflow every .go file under the current directory tree:
+
+    parfit -r '*.go'
+
+Equivalent via shell globstar (bash 4+ with shopt -s globstar, or
+zsh by default):
+
+    parfit **/*.go
+
+Reflow every file matching one of several names across the tree
+(fd-style):
+
+    parfit -r README CHANGELOG LICENSE
+
+Reflow a whole subtree, excluding vendored code:
+
+    parfit -r --exclude 'vendor/**' src/
+
+Reflow every Python file, forcing the Python language parser on
+unusual extensions:
+
+    parfit -r '*.pyi' --lang python
+
+Common editor wiring:
+
+    vim      select a comment block, then :!parfit
+    emacs    M-| parfit RET on a region
+    vscode   bind a key to "Filter Through Command" running parfit
+
+Directory walks respect .gitignore and other ignore rules by
+default, via the same walker ripgrep and fd use.
+
+
+Options
+=======
+
+    -w N, --width N
+            Target width in columns, inclusive of the detected
+            prefix.  Default 68.
+
+    -r, --recursive
+            Match positional arguments recursively against the
+            current directory (or a directory given as a
+            positional).  Treats each non-directory positional
+            as a glob-style name pattern.
+
+    --stdout
+            Print the reformatted output to stdout instead of
+            rewriting files.  Default when reading stdin.
+
+    --include GLOB
+            Extra glob of file names to include, on top of any
+            positional pattern.  Repeatable.
+
+    --exclude GLOB
+            Glob of file names to exclude.  Repeatable.
+
+    -l NAME, --lang NAME
+            Language.  When set, parfit reflows only comment
+            blocks and leaves code untouched.  Overrides
+            auto-detection from the file extension.  Use `text`
+            to force plain-text paragraph reflow regardless of
+            extension.  Known languages: python, shell, elixir,
+            go, rust, javascript, java, scala, c, lua, sql, lisp.
+
+    -s REGEX, --skip REGEX
+            Append a regular expression to the skip list.
+            Paragraphs containing any matching line pass through
+            verbatim.  Repeatable.
+
+    --no-default-skips
+            Disable the built-in directive patterns.  Only user
+            patterns supplied via --skip remain active.
+
+    -p STRING, --prefix STRING
+            Force the given string as the comment prefix on every
+            paragraph instead of auto-detecting.
+
+
+Language support
+================
+
+When parfit is given a source file or a --lang flag, only line
+comments are reflowed; code stays untouched byte-for-byte.  Block
+comments (/* ... */, Python docstrings) are not yet recognised
+and pass through as code.
+
+    Language    Extensions          Line-comment markers
+    Python      .py .pyi            #
+    Shell       .sh .bash .zsh      #
+    Elixir      .ex .exs            #
+    Go          .go                 //
+    Rust        .rs                 // /// //!
+    JavaScript  .js .ts .tsx .jsx   //
+    Java        .java               //
+    Scala       .scala .sc          //
+    C / C++     .c .h .cpp .hpp     //
+    Lua         .lua                --
+    SQL         .sql                --
+    Lisp-like   .el .clj .scm .rkt  ; ;;
+
+Files with other extensions fall through to plain-text mode:
+every paragraph is treated as prose and reflowed.  This is the
+mode you want for READMEs, commit-message drafts, plain mail.
+
+
+Default skip patterns
+=====================
+
+Active unless --no-default-skips is given:
+
+    Go          //go:, // +build, //nolint, //noinspection, //lint:
+    Rust        #[, #![
+    Shell       #!/ (shebang)
+    Python      # type:, # noqa, # pragma:
+    TypeScript  // @ts-, // eslint-, /* eslint-
+    JSDoc       // @param, // @returns, // @internal,
+                // @deprecated, // @see
+    Generic     Lone-URL lines, separator lines (// ----)
+
+
+Prefix detection
+================
+
+parfit detects the prefix on each paragraph from its first line,
+matching the leading whitespace followed by one of:
+
+    /// , //! , // , /** , /* , */ ,  * , * , #! , # , ;
+
+The detected prefix is preserved verbatim on every output line.
+When multiple consecutive lines share a prefix they are treated
+as a single paragraph; a blank line or a prefix change ends it.
+Paragraphs whose prefix is pure whitespace of four or more
+spaces are treated as preformatted blocks and pass through
+untouched.
+
+
+Differences from par
+====================
+
+Optimal-fit line breaking rather than greedy.  The last line of a
+paragraph is rarely left short; Knuth-Plass dynamic programming
+distributes slack evenly.
+
+Built-in directive awareness.  par reformats //go:generate just
+like prose; parfit leaves it alone.
+
+URL safety.  Words containing "://" never split.
+
+Prefix auto-detection covering the comment markers of the most
+common programming languages, not just character classes.
+
+fd-style recursion.  `parfit -r '*.go'` finds and rewrites every
+.go file in the tree.  par operates on stdin or a single file.
+
+
+References
+==========
+
+[1]  Costello, A.M., "par - a paragraph reformatter", 1993.
+     http://www.nicemice.net/par/
+
+[2]  Knuth, D.E. and Plass, M.F., "Breaking Paragraphs into
+     Lines", Software: Practice and Experience, Vol. 11,
+     Issue 11, November 1981, pp. 1119-1184.
+
+[3]  textwrap crate (Martin Geisler), used by parfit for the
+     optimal-fit implementation.  https://crates.io/crates/textwrap
+
+[4]  ignore crate (Andrew Gallant), used by parfit's directory
+     walker.  https://crates.io/crates/ignore
