@@ -151,23 +151,25 @@ comments are reflowed; code stays untouched byte-for-byte.  Block
 comments (/* ... */, Python docstrings) are not yet recognised
 and pass through as code.
 
-    Language    Extensions          Line-comment markers
-    Python      .py .pyi            #
-    Shell       .sh .bash .zsh      #
-    Elixir      .ex .exs            #
-    Go          .go                 //
-    Rust        .rs                 // /// //!
-    JavaScript  .js .ts .tsx .jsx   //
-    Java        .java               //
-    Scala       .scala .sc          //
-    C / C++     .c .h .cpp .hpp     //
-    Lua         .lua                --
-    SQL         .sql                --
-    Lisp-like   .el .clj .scm .rkt  ; ;;
+    Language    Extensions                 Line-comment markers
+    Python      .py .pyi                   #
+    Shell       .sh .bash .zsh             #
+    Elixir      .ex .exs                   #
+    Go          .go                        //
+    Rust        .rs                        // /// //!
+    JavaScript  .js .ts .tsx .jsx          //
+    Java        .java                      //
+    Scala       .scala .sc                 //
+    C / C++     .c .h .cpp .hpp            //
+    Lua         .lua                       --
+    SQL         .sql                       --
+    Lisp-like   .el .clj .scm .rkt         ; ;;
+    Markdown    .md .markdown .mkd         (structural lines)
 
 Files with other extensions fall through to plain-text mode:
 every paragraph is treated as prose and reflowed.  This is the
-mode you want for READMEs, commit-message drafts, plain mail.
+mode you want for commit-message drafts, plain mail, and any text
+file without a recognised extension.
 
 
 Default skip patterns
@@ -199,6 +201,15 @@ as a single paragraph; a blank line or a prefix change ends it.
 Paragraphs whose prefix is pure whitespace of four or more
 spaces are treated as preformatted blocks and pass through
 untouched.
+
+Fenced code blocks (``` ... ``` or ~~~ ... ~~~) pass through
+whole, so install snippets and code examples survive reflow.  The
+fence matcher uses the classic stack pattern from LeetCode 20
+("Valid Parentheses"): push on a matching open, pop on the
+matching close, consult the top to know the current region.
+Three backticks in a row — an open, a close, then an open that
+never closes — behaves as you would expect: every line passes
+through.
 
 
 Differences from par
@@ -235,3 +246,7 @@ References
 
 [4]  ignore crate (Andrew Gallant), used by parfit's directory
      walker.  https://crates.io/crates/ignore
+
+[5]  LeetCode 20, "Valid Parentheses" — the stack pattern
+     parfit's Markdown-mode fence matcher is built on.
+     https://leetcode.com/problems/valid-parentheses/
