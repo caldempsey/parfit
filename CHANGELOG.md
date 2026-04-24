@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.3](https://github.com/caldempsey/parfit/compare/v0.4.2...v0.4.3) - 2026-04-24
+
+### Fixed
+
+- *(ci)* revert manual workflow_dispatch on cargo-dist workflow
+
+### Other
+
+- *(releases)* rename CONTRIBUTING to RELEASES and document the flow
+
 ## [0.4.2](https://github.com/caldempsey/parfit/compare/v0.4.1...v0.4.2) - 2026-04-24
 
 ### Other
