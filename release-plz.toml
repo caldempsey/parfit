@@ -1,0 +1,12 @@
+# release-plz configuration.
+#
+# Why git_release_enable = false: cargo-dist's release.yml creates the
+# GitHub Release itself (with installer instructions and prebuilt binary
+# links generated from dist-workspace.toml).  Letting release-plz create
+# a release first causes cargo-dist's `gh release create` step to fail
+# with "release already exists".  Ownership: release-plz tags + publishes
+# to crates.io; cargo-dist creates the GitHub Release and uploads
+# artifacts + pushes the Homebrew formula.
+
+[workspace]
+git_release_enable = false
