@@ -1,0 +1,30 @@
+name: Mirror to sr.ht
+
+on:
+  push:
+    branches: ['**']
+    tags: ['**']
+
+concurrency:
+  group: mirror-srht
+  cancel-in-progress: false
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Mirror to sr.ht
+        env:
+          SRHT_SSH_KEY: ${{ secrets.SRHT_SSH_KEY }}
+        run: |
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          ssh-keyscan -t ed25519 git.sr.ht >> ~/.ssh/known_hosts
+          eval "$(ssh-agent -s)"
+          ssh-add - <<< "$SRHT_SSH_KEY"
+          git remote add srht git@git.sr.ht:~caldempsey/parfit
+          git push --mirror srht
+          ssh-add -D
+          kill "$SSH_AGENT_PID"
