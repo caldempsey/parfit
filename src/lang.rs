@@ -22,55 +22,114 @@ pub enum Language {
     Lua,
     SQL,
     Lisp,
+    Markdown,
 }
 
-/// Line-comment markers a language accepts. One language can have
-/// more than one (e.g. SQL is `--` but some dialects also accept
-/// `#`).
+/// A paired-delimiter region whose contents pass through verbatim.
+/// Markdown fenced code blocks are the canonical case.
+#[derive(Clone, Copy, Debug)]
+pub struct Fence {
+    pub open: &'static str,
+    pub close: &'static str,
+}
+
+/// Per-language markers the reflow pipeline consults.
+///
+/// * `line_markers` — a line that starts (after indent) with one
+///   of these is a line-comment line. Source-mode gathers runs of
+///   those lines and reflows them as prose.
+///
+/// * `ignore_markers` — a line that starts (after indent) with
+///   one of these passes through verbatim. Used for structural
+///   markup that must not be reflowed: Markdown headings, list
+///   bullets, blockquote arrows, table rows.
+///
+/// * `fences` — paired-delimiter regions whose inner content must
+///   survive verbatim. Fenced code blocks today; more delimiter
+///   kinds (block comments, raw strings) can slot in alongside
+///   without touching the reflow pipeline.
 #[derive(Clone, Copy, Debug)]
 pub struct Spec {
     pub line_markers: &'static [&'static str],
+    pub ignore_markers: &'static [&'static str],
+    pub fences: &'static [Fence],
 }
 
 impl Language {
     pub fn spec(self) -> Spec {
         match self {
-            Language::Text => Spec { line_markers: &[] },
+            Language::Text => Spec {
+                line_markers: &[],
+                ignore_markers: &[],
+                fences: &[],
+            },
             Language::Python => Spec {
                 line_markers: &["#"],
+                ignore_markers: &[],
+                fences: &[],
             },
             Language::Shell => Spec {
                 line_markers: &["#"],
+                ignore_markers: &[],
+                fences: &[],
             },
             Language::Elixir => Spec {
                 line_markers: &["#"],
+                ignore_markers: &[],
+                fences: &[],
             },
             Language::Go => Spec {
                 line_markers: &["//"],
+                ignore_markers: &[],
+                fences: &[],
             },
             Language::Rust => Spec {
                 line_markers: &["//", "///", "//!"],
+                ignore_markers: &[],
+                fences: &[],
             },
             Language::JavaScript => Spec {
                 line_markers: &["//"],
+                ignore_markers: &[],
+                fences: &[],
             },
             Language::Java => Spec {
                 line_markers: &["//"],
+                ignore_markers: &[],
+                fences: &[],
             },
             Language::Scala => Spec {
                 line_markers: &["//"],
+                ignore_markers: &[],
+                fences: &[],
             },
             Language::C => Spec {
                 line_markers: &["//"],
+                ignore_markers: &[],
+                fences: &[],
             },
             Language::Lua => Spec {
                 line_markers: &["--"],
+                ignore_markers: &[],
+                fences: &[],
             },
             Language::SQL => Spec {
                 line_markers: &["--"],
+                ignore_markers: &[],
+                fences: &[],
             },
             Language::Lisp => Spec {
                 line_markers: &[";;", ";"],
+                ignore_markers: &[],
+                fences: &[],
+            },
+            Language::Markdown => Spec {
+                line_markers: &[],
+                ignore_markers: &["#", "- ", "* ", "+ ", "> ", "|"],
+                fences: &[
+                    Fence { open: "```", close: "```" },
+                    Fence { open: "~~~", close: "~~~" },
+                ],
             },
         }
     }
@@ -95,6 +154,7 @@ impl Language {
             "lua" => Language::Lua,
             "sql" => Language::SQL,
             "el" | "lisp" | "clj" | "cljs" | "cljc" | "scm" | "ss" | "rkt" => Language::Lisp,
+            "md" | "markdown" | "mkd" => Language::Markdown,
             _ => Language::Text,
         }
     }
@@ -118,6 +178,7 @@ impl FromStr for Language {
             "lua" => Language::Lua,
             "sql" => Language::SQL,
             "lisp" | "clojure" | "scheme" | "racket" => Language::Lisp,
+            "markdown" | "md" => Language::Markdown,
             other => return Err(format!("unknown language: {other}")),
         })
     }
