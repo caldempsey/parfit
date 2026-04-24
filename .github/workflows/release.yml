@@ -1,8 +1,7 @@
 name: Release
 
 on:
-  push:
-    branches: [dev]
+  workflow_dispatch:
 
 concurrency:
   group: release-${{ github.ref }}
