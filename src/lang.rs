@@ -25,8 +25,11 @@ pub enum Language {
     Markdown,
 }
 
-/// A paired-delimiter region whose contents pass through verbatim.
-/// Markdown fenced code blocks are the canonical case.
+/// A paired-delimiter region: an `open` string and a matching
+/// `close`.  Used in [`Spec`] for two opposite purposes — Markdown
+/// code fences (pass the contents through verbatim) and C-family
+/// block comments (reflow the contents as prose).  The field name
+/// in [`Spec`] picks the treatment; the shape is identical.
 #[derive(Clone, Copy, Debug)]
 pub struct Fence {
     pub open: &'static str,
@@ -44,15 +47,22 @@ pub struct Fence {
 ///   markup that must not be reflowed: Markdown headings, list
 ///   bullets, blockquote arrows, table rows.
 ///
-/// * `fences` — paired-delimiter regions whose inner content must
-///   survive verbatim. Fenced code blocks today; more delimiter
-///   kinds (block comments, raw strings) can slot in alongside
-///   without touching the reflow pipeline.
+/// * `fences` — paired-delimiter regions whose contents pass
+///   through verbatim.  Markdown code fences today; raw-string
+///   literals in future languages slot in alongside without
+///   touching the reflow pipeline.
+///
+/// * `block_comments` — paired-delimiter regions whose contents
+///   are prose and reflow.  The inverse of `fences`: same type,
+///   opposite treatment — `fences` preserve contents byte-for-
+///   byte, `block_comments` feed contents to the reflow pipeline.
+///   C-family `/* … */` is the canonical case.
 #[derive(Clone, Copy, Debug)]
 pub struct Spec {
     pub line_markers: &'static [&'static str],
     pub ignore_markers: &'static [&'static str],
     pub fences: &'static [Fence],
+    pub block_comments: &'static [Fence],
 }
 
 impl Language {
@@ -62,74 +72,112 @@ impl Language {
                 line_markers: &[],
                 ignore_markers: &[],
                 fences: &[],
+                block_comments: &[],
             },
             Language::Python => Spec {
                 line_markers: &["#"],
                 ignore_markers: &[],
                 fences: &[],
+                block_comments: &[],
             },
             Language::Shell => Spec {
                 line_markers: &["#"],
                 ignore_markers: &[],
                 fences: &[],
+                block_comments: &[],
             },
             Language::Elixir => Spec {
                 line_markers: &["#"],
                 ignore_markers: &[],
                 fences: &[],
+                block_comments: &[],
             },
             Language::Go => Spec {
                 line_markers: &["//"],
                 ignore_markers: &[],
                 fences: &[],
+                block_comments: &[Fence {
+                    open: "/*",
+                    close: "*/",
+                }],
             },
             Language::Rust => Spec {
                 line_markers: &["//", "///", "//!"],
                 ignore_markers: &[],
                 fences: &[],
+                block_comments: &[Fence {
+                    open: "/*",
+                    close: "*/",
+                }],
             },
             Language::JavaScript => Spec {
                 line_markers: &["//"],
                 ignore_markers: &[],
                 fences: &[],
+                block_comments: &[Fence {
+                    open: "/*",
+                    close: "*/",
+                }],
             },
             Language::Java => Spec {
                 line_markers: &["//"],
                 ignore_markers: &[],
                 fences: &[],
+                block_comments: &[Fence {
+                    open: "/*",
+                    close: "*/",
+                }],
             },
             Language::Scala => Spec {
                 line_markers: &["//"],
                 ignore_markers: &[],
                 fences: &[],
+                block_comments: &[Fence {
+                    open: "/*",
+                    close: "*/",
+                }],
             },
             Language::C => Spec {
                 line_markers: &["//"],
                 ignore_markers: &[],
                 fences: &[],
+                block_comments: &[Fence {
+                    open: "/*",
+                    close: "*/",
+                }],
             },
             Language::Lua => Spec {
                 line_markers: &["--"],
                 ignore_markers: &[],
                 fences: &[],
+                block_comments: &[],
             },
             Language::SQL => Spec {
                 line_markers: &["--"],
                 ignore_markers: &[],
                 fences: &[],
+                block_comments: &[],
             },
             Language::Lisp => Spec {
                 line_markers: &[";;", ";"],
                 ignore_markers: &[],
                 fences: &[],
+                block_comments: &[],
             },
             Language::Markdown => Spec {
                 line_markers: &[],
                 ignore_markers: &["#", "- ", "* ", "+ ", "> ", "|"],
                 fences: &[
-                    Fence { open: "```", close: "```" },
-                    Fence { open: "~~~", close: "~~~" },
+                    Fence {
+                        open: "```",
+                        close: "```",
+                    },
+                    Fence {
+                        open: "~~~",
+                        close: "~~~",
+                    },
                 ],
+                block_comments: &[],
             },
         }
     }
