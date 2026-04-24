@@ -15,12 +15,11 @@
 //!   reflow only the comment blocks and leave the code untouched.
 
 mod directives;
+mod lang;
+mod options;
 mod prefix;
 mod reflow;
 mod source;
-
-pub mod lang;
-pub mod options;
 
 pub use lang::Language;
 pub use options::Options;
