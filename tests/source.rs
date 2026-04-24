@@ -91,8 +91,14 @@ fn language_inferred_from_path_extension() {
     assert_eq!(Language::from_path(Path::new("z.cpp")), Language::C);
     assert_eq!(Language::from_path(Path::new("q.lua")), Language::Lua);
     assert_eq!(Language::from_path(Path::new("README")), Language::Text);
-    assert_eq!(Language::from_path(Path::new("notes.md")), Language::Markdown);
-    assert_eq!(Language::from_path(Path::new("notes.markdown")), Language::Markdown);
+    assert_eq!(
+        Language::from_path(Path::new("notes.md")),
+        Language::Markdown
+    );
+    assert_eq!(
+        Language::from_path(Path::new("notes.markdown")),
+        Language::Markdown
+    );
 }
 
 #[test]
