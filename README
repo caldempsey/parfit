@@ -15,8 +15,9 @@ Installation
 ============
 
     cargo install parfit
+    brew install caldempsey/parfit/parfit
 
-Installs a parfit binary on $PATH.
+Either installs a parfit binary on $PATH.
 
 
 Example
