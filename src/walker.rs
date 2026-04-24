@@ -45,8 +45,7 @@ pub fn walk(
 
         let walker = WalkBuilder::new(path).build();
         for entry in walker {
-            let entry = entry
-                .map_err(|e| io::Error::new(io::ErrorKind::Other, e.to_string()))?;
+            let entry = entry.map_err(|e| io::Error::new(io::ErrorKind::Other, e.to_string()))?;
             if !entry.file_type().map(|ft| ft.is_file()).unwrap_or(false) {
                 continue;
             }
@@ -66,8 +65,8 @@ fn build_globset(patterns: &[String]) -> io::Result<Option<GlobSet>> {
     }
     let mut builder = GlobSetBuilder::new();
     for p in patterns {
-        let glob = Glob::new(p)
-            .map_err(|e| io::Error::new(io::ErrorKind::InvalidInput, e.to_string()))?;
+        let glob =
+            Glob::new(p).map_err(|e| io::Error::new(io::ErrorKind::InvalidInput, e.to_string()))?;
         builder.add(glob);
     }
     builder
