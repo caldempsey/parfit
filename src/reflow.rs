@@ -150,13 +150,13 @@ fn emit_paragraph(lines: &[&str], prefix: &str, opts: &Options, out: &mut String
 ///
 /// Per call: O(k) where k is the number of configured fences (two
 /// for Markdown, zero for every other language). Amortized O(1).
-struct FenceStack<'a> {
-    configured: &'a [Fence],
-    open: Vec<&'a Fence>,
+struct FenceStack {
+    configured: &'static [Fence],
+    open: Vec<&'static Fence>,
 }
 
-impl<'a> FenceStack<'a> {
-    fn new(configured: &'a [Fence]) -> Self {
+impl FenceStack {
+    fn new(configured: &'static [Fence]) -> Self {
         Self {
             configured,
             open: Vec::new(),
