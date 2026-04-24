@@ -3,12 +3,26 @@ parfit - paragraph fit
 
 parfit reflows the prose inside code comments to a target width
 using optimal-fit line breaking, and passes machine-readable
-directives through unchanged.  It is inspired by Adam M.
-Costello's par (1993) and aims to be a drop-in for the same niche
-with codebase awareness added.
+directives through unchanged.  This project was formatted with
+parfit!  It is inspired by Adam M. Costello's par (1993) and aims
+to be a drop-in for the same niche with codebase awareness added.
 
 Copyright (C) 2026 Callum Dempsey Leach.  Released under the MIT
 licence; see LICENSE.
+
+
+Example
+=======
+
+A comment that looks like this:
+
+    // Far out in the uncharted backwaters of the unfashionable end of the western spiral arm of the Galaxy lies a small unregarded yellow sun.
+
+Gets reflowed into this:
+
+    // Far out in the uncharted backwaters of the unfashionable end
+    // of the western spiral arm of the Galaxy lies a small unregarded
+    // yellow sun.
 
 
 Installation
