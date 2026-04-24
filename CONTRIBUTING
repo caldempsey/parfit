@@ -1,0 +1,16 @@
+parfit - contributing
+=====================
+
+Semantic commits.  Use Conventional Commits — feat:, fix:, docs:,
+ci:, test:, refactor:, style:, chore: — so the log reads as a
+changelog without further processing.
+
+Releases are automatic.  release-plz watches dev, reads the
+commits since the last tag, and opens a "Release vX.Y.Z" PR that
+bumps Cargo.toml and updates CHANGELOG.md.  Merging that PR
+publishes to crates.io, tags the commit, and opens a GitHub
+release.
+
+rel tracks the last release.  The release workflow fast-forwards
+the rel branch to whatever commit was just released, so rel is a
+pointer to the current published version and never leads dev.
