@@ -14,13 +14,23 @@ use crate::reflow::reflow;
 
 /// Reflow comment blocks inside a source file, leaving code alone.
 /// When `language` is [`Language::Text`] this falls back to plain
-/// [`reflow`].
+/// [`reflow`]. Markdown is handled by applying the language's
+/// ignore / fence markers to [`Options`] and running the whole
+/// input through [`reflow`]: structural lines (headings, bullets,
+/// tables) pass through verbatim, fenced code blocks pass through
+/// verbatim, and the prose in between reflows normally.
 pub fn reflow_source(input: &str, language: Language, opts: &Options) -> String {
     if language == Language::Text {
         return reflow(input, opts);
     }
 
     let spec = language.spec();
+
+    if language == Language::Markdown {
+        let opts = opts.clone().with_spec(spec);
+        return reflow(input, &opts);
+    }
+
     if spec.line_markers.is_empty() {
         return reflow(input, opts);
     }
@@ -44,14 +54,14 @@ pub fn reflow_source(input: &str, language: Language, opts: &Options) -> String 
     out
 }
 
-fn strip_newline(s: &str) -> &str {
-    s.strip_suffix('\n').unwrap_or(s)
-}
-
 /// A line qualifies as a comment line when, after any leading
 /// whitespace, its first non-whitespace run starts with one of
 /// the language's line-comment markers.
 fn is_comment_line(line: &str, spec: &Spec) -> bool {
     let trimmed = line.trim_start();
     spec.line_markers.iter().any(|m| trimmed.starts_with(m))
+}
+
+fn strip_newline(s: &str) -> &str {
+    s.strip_suffix('\n').unwrap_or(s)
 }

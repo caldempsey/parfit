@@ -3,6 +3,7 @@
 use regex::Regex;
 
 use crate::directives::is_default_directive;
+use crate::lang::{Fence, Spec};
 
 /// Options controlling how parfit reflows a block of text.
 #[derive(Clone, Debug)]
@@ -13,6 +14,8 @@ pub struct Options {
     pub forced_prefix: Option<String>,
     pub(crate) default_skips: bool,
     pub(crate) extra_skips: Vec<Regex>,
+    pub(crate) ignore_markers: &'static [&'static str],
+    pub(crate) fences: &'static [Fence],
 }
 
 impl Options {
@@ -24,6 +27,8 @@ impl Options {
             forced_prefix: None,
             default_skips: true,
             extra_skips: Vec::new(),
+            ignore_markers: &[],
+            fences: &[],
         }
     }
 
@@ -46,11 +51,26 @@ impl Options {
         Ok(self)
     }
 
+    /// Overlay a language [`Spec`] onto these options so the
+    /// reflow pipeline honours that language's `ignore_markers`
+    /// and `fences`. Line-comment markers are consumed by the
+    /// source-mode walker separately and are not threaded here.
+    pub(crate) fn with_spec(mut self, spec: Spec) -> Self {
+        self.ignore_markers = spec.ignore_markers;
+        self.fences = spec.fences;
+        self
+    }
+
     pub(crate) fn matches_skip(&self, line: &str) -> bool {
         let trimmed = line.trim_start();
         if self.default_skips && is_default_directive(trimmed) {
             return true;
         }
         self.extra_skips.iter().any(|r| r.is_match(line))
+    }
+
+    pub(crate) fn matches_ignore_marker(&self, line: &str) -> bool {
+        let trimmed = line.trim_start();
+        self.ignore_markers.iter().any(|m| trimmed.starts_with(m))
     }
 }
