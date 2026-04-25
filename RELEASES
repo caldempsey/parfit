@@ -7,7 +7,7 @@ opens a "Release vX.Y.Z" PR whose contents are a Cargo.toml
 version bump and the CHANGELOG entries for every commit since the
 last tag.  Merging that PR is the release: the commit lands on
 dev, publish.yml publishes the crate and tags the commit, and
-cargo-dist fires on the tag to upload prebuilt binaries and push
+goreleaser fires on the tag to upload prebuilt binaries and push
 the Homebrew formula.
 
 rel tracks the last release.  The release workflow fast-forwards
